@@ -35,7 +35,7 @@ class CPUDataset(Dataset):
         return input_seq, target_seq
 
 # Load the data again
-data = pd.read_excel(file_path)
+file_path = r'D:\ml-codespace\Event-Prediction\Data\Dummydata500.csv'
 
 # Create the dataset and dataloaders
 sequence_length = 10  # Define the sequence length
