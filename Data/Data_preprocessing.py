@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
+import pandas as pd  # Assuming you're using pandas to load the CSV file
 
 # Custom Dataset class for CPU usage data
 class CPUDataset(Dataset):
@@ -34,8 +35,9 @@ class CPUDataset(Dataset):
         
         return input_seq, target_seq
 
-# Load the data again
+# Load the data from the CSV file
 file_path = r'D:\ml-codespace\Event-Prediction\Data\Dummydata500.csv'
+data = pd.read_csv(file_path)
 
 # Create the dataset and dataloaders
 sequence_length = 10  # Define the sequence length
@@ -50,18 +52,3 @@ train_dataset, val_dataset = torch.utils.data.random_split(cpu_dataset, [train_s
 batch_size = 32
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
-
-# usage in a training loop
-for epoch in range(num_epochs):
-    for input_seq, target_seq in train_loader:
-        # Move to GPU if available
-        input_seq, target_seq = input_seq.to(device), target_seq.to(device)
-        
-        # Forward pass through the model
-        output = model(input_seq, target_seq)
-        
-        # Calculate loss, backpropagate, and optimize
-        loss = criterion(output, target_seq)
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
