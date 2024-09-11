@@ -6,6 +6,9 @@ from transformer_event_pred import TransformerModel
 from Data.Data_preprocessing import CPUDataset
 import pandas as pd
 
+# Enabling nested tensor operations
+torch._C._jit_set_profiling_executor(False)
+torch._C._jit_set_profiling_mode(False)
 # Load the dataset
 file_path = r'D:\ml-codespace\Event-Prediction\Data\Dummydata500.csv'
 data = pd.read_csv(file_path)
@@ -28,7 +31,7 @@ criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Training loop
-num_epochs = 1
+num_epochs = 5
 for epoch in range(num_epochs):
     model.train()
     for input_seq, target_seq in train_loader:
