@@ -81,7 +81,7 @@ class TransformerDecoderLayer(nn.Module):
 
 # Transformer Model
 class TransformerModel(nn.Module):
-    def __init__(self, input_dim, output_dim, d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048, dropout=0.1):
+    def __init__(self, input_dim=20, output_dim=20, d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048, dropout=0.1):
         super(TransformerModel, self).__init__()
         self.model_type = 'Transformer'
         self.pos_encoder = PositionalEncoding(d_model)
