@@ -104,25 +104,25 @@ class MultiHeadAttention(nn.Module):
 #         return output
 
 
-class TransformerModel(nn.Module):
-    def __init__(self, input_dim=20, output_dim=20, d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048, dropout=0.1):
-        super(TransformerModel, self).__init__()
-        self.model_type = 'Transformer'
-        self.pos_encoder = PositionalEncoding(d_model)
-        self.encoder_layer = nn.TransformerEncoderLayer(d_model, nhead, dim_feedforward, dropout)
-        self.decoder_layer = nn.TransformerDecoderLayer(d_model, nhead, dim_feedforward, dropout)
-        self.encoder = nn.TransformerEncoder(self.encoder_layer, num_encoder_layers)
-        self.decoder = nn.TransformerDecoder(self.decoder_layer, num_decoder_layers)
-        self.input_embed = nn.Linear(input_dim, d_model)
-        self.output_embed = nn.Linear(d_model, output_dim)
-        self.d_model = d_model
+# class TransformerModel(nn.Module):
+#     def __init__(self, input_dim=20, output_dim=20, d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048, dropout=0.1):
+#         super(TransformerModel, self).__init__()
+#         self.model_type = 'Transformer'
+#         self.pos_encoder = PositionalEncoding(d_model)
+#         self.encoder_layer = nn.TransformerEncoderLayer(d_model, nhead, dim_feedforward, dropout)
+#         self.decoder_layer = nn.TransformerDecoderLayer(d_model, nhead, dim_feedforward, dropout)
+#         self.encoder = nn.TransformerEncoder(self.encoder_layer, num_encoder_layers)
+#         self.decoder = nn.TransformerDecoder(self.decoder_layer, num_decoder_layers)
+#         self.input_embed = nn.Linear(input_dim, d_model)
+#         self.output_embed = nn.Linear(d_model, output_dim)
+#         self.d_model = d_model
 
-    def forward(self, src, tgt, src_mask=None, tgt_mask=None, memory_mask=None):
-        src = self.input_embed(src) * math.sqrt(self.d_model)
-        src = self.pos_encoder(src)
-        memory = self.encoder(src, src_mask)
-        tgt = self.input_embed(tgt) * math.sqrt(self.d_model)
-        tgt = self.pos_encoder(tgt)
-        output = self.decoder(tgt, memory, tgt_mask, memory_mask)
-        output = self.output_embed(output)
-        return output
+#     def forward(self, src, tgt, src_mask=None, tgt_mask=None, memory_mask=None):
+#         src = self.input_embed(src) * math.sqrt(self.d_model)
+#         src = self.pos_encoder(src)
+#         memory = self.encoder(src, src_mask)
+#         tgt = self.input_embed(tgt) * math.sqrt(self.d_model)
+#         tgt = self.pos_encoder(tgt)
+#         output = self.decoder(tgt, memory, tgt_mask, memory_mask)
+#         output = self.output_embed(output)
+#         return output
