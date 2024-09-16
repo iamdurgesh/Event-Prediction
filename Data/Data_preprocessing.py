@@ -38,18 +38,18 @@ class CPUDataset(Dataset):
 # Load the data from the CSV file
 # file_path = r'D:\ml-codespace\Event-Prediction\Data\Dummydata500.csv'
 # file_path = r'D:\ml-codespace\Event-Prediction\Data\systemDataset.csv'
-data = pd.read_csv(file_path)
+# data = pd.read_csv(file_path)
 
-# Create the dataset and dataloaders
-sequence_length = 10  # Define the sequence length
-cpu_dataset = CPUDataset(data, sequence_length=sequence_length)
+# # Create the dataset and dataloaders
+# sequence_length = 10  # Define the sequence length
+# cpu_dataset = CPUDataset(data, sequence_length=sequence_length)
 
-# Split the dataset into training and validation sets
-train_size = int(0.8 * len(cpu_dataset))
-val_size = len(cpu_dataset) - train_size
-train_dataset, val_dataset = torch.utils.data.random_split(cpu_dataset, [train_size, val_size])
+# # Split the dataset into training and validation sets
+# train_size = int(0.8 * len(cpu_dataset))
+# val_size = len(cpu_dataset) - train_size
+# train_dataset, val_dataset = torch.utils.data.random_split(cpu_dataset, [train_size, val_size])
 
-# Create dataloaders
-batch_size = 32
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+# # Create dataloaders
+# batch_size = 32
+# train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+# val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
