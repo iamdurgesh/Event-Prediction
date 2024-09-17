@@ -35,9 +35,9 @@ class CPUDataset(Dataset):
         
         return input_seq, target_seq
 
-# Load the data from the CSV file
-# file_path = r'D:\ml-codespace\Event-Prediction\Data\Dummydata500.csv'
-# file_path = r'D:\ml-codespace\Event-Prediction\Data\systemDataset.csv'
+Load the data from the CSV file
+file_path = r'D:\ml-codespace\Event-Prediction\Data\Dummydata500.csv'
+file_path = r'D:\ml-codespace\Event-Prediction\Data\systemDataset.csv'
 data = pd.read_csv(file_path)
 
 # Create the dataset and dataloaders
