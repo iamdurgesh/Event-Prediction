@@ -53,3 +53,5 @@ train_dataset, val_dataset = torch.utils.data.random_split(cpu_dataset, [train_s
 batch_size = 32
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
+
