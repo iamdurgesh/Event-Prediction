@@ -51,10 +51,13 @@ def create_global_context_dataset(filtered_data, high_impact_event_columns, save
 
 # Example usage:
 # Assuming 'filtered_data_no_duplicates' is your filtered DataFrame with high-impact events
+# This should be the final output from data_preprocessing.py
 high_impact_event_columns = [
     'event_vehicle_detection', 'event_pedestrian_detection', 'event_traffic_sign', 
     'event_red_traffic_light', 'lane_change', 'left_lane_change', 'right_lane_change', 
     'event_global_path', 'event_intersection'
 ]
 
+# Call the function with the filtered data
+# Uncomment the line below and ensure 'filtered_data_no_duplicates' is passed from preprocessing output
 # create_global_context_dataset(filtered_data_no_duplicates, high_impact_event_columns, save_format="json")
