@@ -62,5 +62,42 @@ def add_features(data):
     data['cpu_utility_lag_2'] = data['cpu_utility'].shift(2).fillna(0)
     data['memory_utility_lag_1'] = data['memory_utility'].shift(1).fillna(0)
     data['memory_utility_lag_2'] = data['memory_utility'].shift(2).fillna(0)
+
+    
+    def add_advanced_features(data, cycle_size=78):
+    # Mean, median, and std per cycle
+        data['cycle_mean_cpu'] = data['cpu_utility'].rolling(window=cycle_size, min_periods=1).mean()
+        data['cycle_std_memory'] = data['memory_utility'].rolling(window=cycle_size, min_periods=1).std()
+    
+    # Time since last event_task_start
+        data['time_since_last_task_start'] = data['timestamp'] - data['timestamp'].where(data['event_task_start'] == 1).ffill().fillna(0)
+    
+    # Exponential moving average for CPU utility
+        data['cpu_utility_ema'] = data['cpu_utility'].ewm(span=5, adjust=False).mean()
+    
+    # Percentage change and delta feature for cpu_utility
+        data['cpu_utility_pct_change'] = data['cpu_utility'].pct_change().fillna(0)
+        data['cpu_utility_delta'] = data['cpu_utility'].diff().fillna(0)
     
     return data
+
+def segment_by_cycle(data, cycle_size=78):
+    # Segment data into cycles of specified size (default 78 rows per cycle)
+    cycles = [data.iloc[i:i + cycle_size] for i in range(0, len(data), cycle_size)]
+    return cycles
+
+
+# Define high-impact events based on unique interactions, detection events, and lane changes
+high_impact_events = [
+    'event_vehicle_detection', 'event_pedestrian_detection', 'event_traffic_sign', 
+    'event_red_traffic_light', 'lane_change', 'left_lane_change', 'right_lane_change', 
+    'event_global_path', 'event_intersection'
+]
+
+# Filter the dataset to retain only the high-impact event columns along with relevant context features
+filtered_data = data[high_impact_events + ['timestamp', 'cycle', 'cpu_utility', 'memory_utility']]
+# Example of how to use the function on a dataset
+# data = pd.read_csv('your_dataset.csv')
+# preprocessed_data = preprocess_data(data)
+# segmented_cycles = segment_by_cycle(preprocessed_data, cycle_size=78)
+
