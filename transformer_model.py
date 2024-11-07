@@ -64,7 +64,32 @@ class PositionalEncoding(nn.Module):
         # Register as a buffer so it’s not updated during training
         self.register_buffer('pe', pe)
 
-    def forward(self, x):
-        # Add positional encoding to the input sequence
-        x = x + self.pe[:x.size(0), :]
-        return self.dropout(x)
+    def forward(self, src, tgt, src_key_padding_mask=None, tgt_key_padding_mask=None, memory_key_padding_mask=None):
+        # """
+        # Forward pass with optional masks for padding and causality.
+        # """
+        src = self.event_embedding(src) * math.sqrt(self.d_model)
+        src = self.positional_encoding(src)
+        
+        tgt = self.event_embedding(tgt) * math.sqrt(self.d_model)
+        tgt = self.positional_encoding(tgt)
+        
+        # Pass through transformer with masks
+        output = self.transformer(
+            src, tgt,
+            src_key_padding_mask=src_key_padding_mask,
+            tgt_key_padding_mask=tgt_key_padding_mask,
+            memory_key_padding_mask=memory_key_padding_mask,
+            tgt_mask=self.generate_square_subsequent_mask(tgt.size(0)).to(tgt.device)  # Causal mask
+        )
+        
+        output = self.output_layer(output)
+        return output
+
+    def generate_square_subsequent_mask(self, sz):
+        """
+        Generate a causal (future-blind) mask for the target sequence.
+        """
+        mask = torch.triu(torch.ones(sz, sz), diagonal=1).type(torch.bool)
+        return mask
+
