@@ -1,0 +1,9 @@
+# Ignore virtual environments
+env/
+venv/
+.myenv/
+myenv/
+env1/
+
+
+.DS_Store
