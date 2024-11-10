@@ -148,6 +148,6 @@ def load_and_preprocess_data(input_path, output_path=None):
 
 # Example usage to load, preprocess, and optionally save the preprocessed data
 if __name__ == "__main__":
-    input_path = 'data/2024.06.11 10h19m25s/FGC.csv'  # Path to your raw data file
+    input_path = 'data/FGC.csv'  # Path to your raw data file
     output_path = 'data/preprocessed_data.csv'   # Path to save preprocessed data
     preprocessed_data = load_and_preprocess_data(input_path, output_path)
