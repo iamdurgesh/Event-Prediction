@@ -77,7 +77,7 @@ def add_features(data):
     new_columns['memory_utility_lag_2'] = data['memory_utility'].shift(2).fillna(0)
 
     # Advanced features for cycles
-    cycle_size = 78
+    cycle_size = 77
     new_columns['cycle_mean_cpu'] = data['cpu_utility'].rolling(window=cycle_size, min_periods=1).mean()
     new_columns['cycle_std_memory'] = data['memory_utility'].rolling(window=cycle_size, min_periods=1).std()
     
@@ -97,7 +97,7 @@ def add_features(data):
     return data
 
     
-def add_advanced_features(data, cycle_size=78):
+def add_advanced_features(data, cycle_size =77):
 # Mean, median, and std per cycle
     data['cycle_mean_cpu'] = data['cpu_utility'].rolling(window=cycle_size, min_periods=1).mean()
     data['cycle_std_memory'] = data['memory_utility'].rolling(window=cycle_size, min_periods=1).std()
@@ -114,7 +114,7 @@ def add_advanced_features(data, cycle_size=78):
 
     return data
 
-def segment_by_cycle(data, cycle_size=78):
+def segment_by_cycle(data, cycle_size=77):
     # Segment data into cycles of specified size (default 78 rows per cycle)
     cycles = [data.iloc[i:i + cycle_size] for i in range(0, len(data), cycle_size)]
     return cycles
@@ -148,6 +148,6 @@ def load_and_preprocess_data(input_path, output_path=None):
 
 # Example usage to load, preprocess, and optionally save the preprocessed data
 if __name__ == "__main__":
-    input_path = 'data/2024.06.11 10h19m25s/FGC.csv'  # Path to your raw data file
+    input_path = 'data/FGC.csv'  # Path to your raw data file
     output_path = 'data/preprocessed_data.csv'   # Path to save preprocessed data
     preprocessed_data = load_and_preprocess_data(input_path, output_path)
