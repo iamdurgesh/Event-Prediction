@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def extract_event_sequence(file_path, output_file='sequence.csv'):
     """
@@ -24,18 +25,14 @@ def extract_event_sequence(file_path, output_file='sequence.csv'):
     else:
         raise ValueError("Unsupported file format. Please use .csv or .xlsx files.")
     
-    # Check and print column names for verification
     print("Column names in dataset:", data.columns.tolist())
     
     # Extract all column names that start with 'event_'
     event_columns = [col.strip() for col in data.columns if col.strip().startswith('event_')]
-    
-    # Check if any event columns were found
     if not event_columns:
         print("No columns starting with 'event_' were found.")
         return []
     
-    # Get the column indices for each event
     event_ids = [(event, data.columns.get_loc(event)) for event in event_columns]
     
     # Sort the events by their column index to preserve the dataset order
@@ -53,6 +50,17 @@ file_path = 'data/FGC.csv'  # Replace with the path to your main dataset file
 output_file = 'data/sequence.csv' 
 event_sequence = extract_event_sequence(file_path, output_file)
 print(event_sequence)
+#Plotting a graph
+# Plotting the event sequence
+plt.figure(figsize=(10, 6))
+plt.plot(event_sequence['Column_Index'], event_sequence['Event'], marker='o', linestyle='-', color='b')
+plt.xlabel('Column Index')
+plt.ylabel('Event')
+plt.title('Event Sequence by Column Index')
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
 
 
 # Event Dataset extraction
@@ -101,3 +109,6 @@ file_path = 'data/FGC.csv'  # Replace with the path to your main dataset file
 output_file = 'data/event_only_dataset.csv' 
 event_only_data = create_event_only_dataset(file_path, output_file)
 print(event_only_data.head())
+
+
+
