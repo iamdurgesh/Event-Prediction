@@ -6,7 +6,7 @@ from model import TransformerEventModel
 from train import train_model, evaluate_with_mask
 
 # Hyperparameters and paths
-file_path = 'data/your_file.xlsx'  # Replace with your actual file path
+file_path = 'data/event_only_dataset.csv'  # Replace with your actual file path
 vocab_size = 100  # Adjust to match actual event vocabulary size
 embed_size = 128
 num_heads = 4
