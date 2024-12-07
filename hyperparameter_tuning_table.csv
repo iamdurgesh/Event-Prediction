@@ -1,0 +1,5 @@
+Experiment,Embedding Size,Number of Heads,Number of Layers,Learning Rate
+1,128,4,2,0.0001
+2,256,8,4,0.0005
+3,128,4,6,0.001
+4,256,8,2,0.0001
