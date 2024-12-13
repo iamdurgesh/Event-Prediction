@@ -15,16 +15,18 @@ def calculate_loss(outputs, targets, mask=None):
     Returns:
         torch.Tensor: Loss value.
     """
-    criterion = nn.CrossEntropyLoss(ignore_index=0)  # Ignore padding token (ID 0)
-    
-    # Clamp target values to avoid out-of-bounds errors
+    criterion = nn.CrossEntropyLoss(ignore_index=0)
     targets = torch.clamp(targets, min=0, max=outputs.size(-1) - 1)
 
-    # Reshape outputs and targets for CrossEntropyLoss
-    outputs = outputs.view(-1, outputs.size(-1))  # [batch_size * seq_len, vocab_size]
-    targets = targets.view(-1)  # [batch_size * seq_len]
+    outputs = outputs.view(-1, outputs.size(-1))
+    targets = targets.view(-1)
 
-    loss = criterion(outputs, targets)
+    if mask is not None:
+        mask = mask.view(-1)
+        loss = criterion(outputs[mask != 0], targets[mask != 0])
+    else:
+        loss = criterion(outputs, targets)
+
     return loss
 
 
@@ -42,6 +44,12 @@ def train_model(model, train_loader, val_loader, config, start_epoch=1):
         for inputs, targets, mask in train_loader:
             inputs, targets, mask = inputs.to(device), targets.to(device), mask.to(device)
 
+            # Debugging shapes
+            if config.get("debug", False):
+                print(f"Training - Inputs Shape: {inputs.shape}, Targets Shape: {targets.shape}")
+                print(f"Training - Mask Shape: {mask.shape}")
+
+            # Zero gradients
             optimizer.zero_grad()
 
             src_key_padding_mask = mask == 0
@@ -82,6 +90,11 @@ def validate_model(model, val_loader, config):
         for inputs, targets, mask in val_loader:
             # Move tensors to device
             inputs, targets, mask = inputs.to(config["device"]), targets.to(config["device"]), mask.to(config["device"])
+
+            # Debugging shapes
+            if config.get("debug", False):
+                print(f"Validation - Inputs Shape: {inputs.shape}, Targets Shape: {targets.shape}")
+                print(f"Validation - Mask Shape: {mask.shape}")
 
             # Generate masks
             src_key_padding_mask = mask == 0
