@@ -22,7 +22,7 @@ for file in files:
             if len(key_value) == 2:  # Ensure the line is in "key: value" format
                 key = key_value[0].strip().lower()
                 value = key_value[1].strip().replace("{", "").replace("}", "").replace("'", "")
-                
+
                 if key == "embed_size":
                     experiment["Embedding Size"] = int(value)
                 elif key == "num_heads":
@@ -37,9 +37,14 @@ for file in files:
                     experiment["Validation Loss"] = float(value)
         experiment_data.append(experiment)
 
-
 # Convert to DataFrame
 results_df = pd.DataFrame(experiment_data)
+
+# Extract numerical experiment index from the "Experiment" column
+results_df["Experiment Index"] = results_df["Experiment"].str.extract(r"(\d+)").astype(int)
+
+# Sort the DataFrame by the experiment index
+results_df = results_df.sort_values("Experiment Index").reset_index(drop=True)
 
 # Save to CSV for reference
 results_df.to_csv("experiment_results_summary.csv", index=False)

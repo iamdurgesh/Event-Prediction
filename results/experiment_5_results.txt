@@ -1,0 +1,4 @@
+Experiment 5/5
+Config: {'embed_size': 512, 'num_heads': 16, 'num_layers': 6, 'learning_rate': 0.0003}
+Final Training Loss: 0.9997
+Final Validation Loss: 1.0020
