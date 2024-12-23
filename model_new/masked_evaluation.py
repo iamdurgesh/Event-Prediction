@@ -2,16 +2,40 @@ from sklearn.metrics import precision_recall_fscore_support, accuracy_score, cla
 import torch
 
 def evaluate_model_with_mask(model, data_loader, config, event_vocab, excluded_events=None):
+    """
+    Evaluate the model on a dataset while excluding specific events.
+
+    Args:
+        model (nn.Module): The trained model to evaluate.
+        data_loader (DataLoader): DataLoader for the evaluation dataset.
+        config (dict): Configuration dictionary.
+        event_vocab (dict): Mapping of events to indices.
+        excluded_events (list or set): Events to exclude during evaluation.
+
+    Returns:
+        dict: A dictionary containing accuracy, precision, recall, and F1 score.
+        str: Classification report as a formatted string.
+    """
+
     model.eval()
     device = config["device"]
+
+    # Handle excluded events, including the <EXCLUDED> token
     excluded_event_ids = [event_vocab[event] for event in excluded_events if event in event_vocab]
     
+    # Check and add the <EXCLUDED> token to the excluded IDs if it exists in the vocabulary
+    if "<EXCLUDED>" in event_vocab:
+        excluded_event_ids.append(event_vocab["<EXCLUDED>"])
+    else:
+        print("Warning: <EXCLUDED> token is not in the event vocabulary. Skipping it.")
+
+    # Initialize lists for storing predictions, targets, and masks
     all_predictions = []
     all_targets = []
     mask = []
 
     with torch.no_grad():
-        for inputs, targets in data_loader:
+        for inputs, targets, _ in data_loader:  # Expecting three outputs due to collate_fn
             inputs, targets = inputs.to(device), targets.to(device)
 
             outputs = model(inputs, inputs)
@@ -37,11 +61,13 @@ def evaluate_model_with_mask(model, data_loader, config, event_vocab, excluded_e
     accuracy = accuracy_score(filtered_targets, filtered_predictions)
     precision, recall, f1, _ = precision_recall_fscore_support(filtered_targets, filtered_predictions, average="weighted")
 
+    classification_rep = classification_report(filtered_targets, filtered_predictions)
+
     return {
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
         "f1": f1,
-    }
+    }, classification_rep
 
 
