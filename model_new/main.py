@@ -235,7 +235,7 @@ def main():
 
     # Configurations
     model_path = "model_weights_epoch10.pth"
-    evaluate_only = False  # Set to True to skip training and directly evaluate
+    evaluate_only = True  # Set to True to skip training and directly evaluate
 
     # Dataset paths
     dataset_paths = {
@@ -254,10 +254,17 @@ def main():
 
     # Load a sample dataset to extract column names and build vocabulary
     sample_data = pd.read_csv(dataset_paths["train"])
+    print("Columns in dataset:", sample_data.columns.tolist())
     event_columns = [col for col in sample_data.columns if col != "cycle"]
     event_vocab = {event: idx for idx, event in enumerate(event_columns, start=1) if event not in excluded_events}
     event_vocab["<PAD>"] = 0
-    vocab_size = len(event_vocab)
+    event_vocab["<EXCLUDED>"] = len(event_vocab) 
+
+    # For debug
+    max_event_idx = max(event_vocab.values())
+    print(f"Maximum Event Index in Vocabulary: {max_event_idx}")
+    vocab_size = max(event_vocab.values()) + 1  # Ensure vocab_size accounts for the max index
+    print(f"Final Vocabulary Size: {vocab_size}")
 
     print("Filtered Event Vocabulary:", event_vocab)
     print("Vocabulary Size:", vocab_size)
@@ -266,22 +273,40 @@ def main():
     config = {
         "batch_size": 32,
         "embed_size": 256,
-        "num_heads": 2,
-        "num_layers": 8,
+        "num_heads": 8,
+        "num_layers": 4,
         "vocab_size": vocab_size,
         "max_len": 77,
         "learning_rate": 1e-3,
-        "epochs": 1,
+        "epochs": 10,
         "device": device,
+        "debug": True,  # Enable debugging
+        "dropout": 0.3,                # Increase dropout for regularization
+        "weight_decay": 1e-5, 
     }
 
     # Excluded event IDs
     excluded_ids = {event_vocab[event] for event in excluded_events if event in event_vocab}
+    print(f"Excluded Event IDs: {excluded_ids}")
 
     # Initialize datasets and dataloaders
-    train_dataset = EventDataset(dataset_paths["train"], event_vocab, max_len=config["max_len"], excluded_events=excluded_events)
-    val_dataset = EventDataset(dataset_paths["val"], event_vocab, max_len=config["max_len"], excluded_events=excluded_events)
-    test_dataset = EventDataset(dataset_paths["test"], event_vocab, max_len=config["max_len"], excluded_events=excluded_events)
+# Initialize datasets and dataloaders
+    train_dataset = EventDataset(
+        dataset_paths["train"], event_vocab, max_len=config["max_len"], excluded_events=excluded_events, mode="train"
+    )
+    val_dataset = EventDataset(
+        dataset_paths["val"], event_vocab, max_len=config["max_len"], excluded_events=excluded_events, mode="val"
+    )
+    test_dataset = EventDataset(
+        dataset_paths["test"], event_vocab, max_len=config["max_len"], excluded_events=excluded_events, mode="test"
+    )
+
+    print(f"Training set size: {len(train_dataset)}")
+    print(f"Validation set size: {len(val_dataset)}")
+    print(f"Test set size: {len(test_dataset)}")
+
+    if len(train_dataset) == 0 or len(val_dataset) == 0:
+        raise ValueError("No valid sequences found in the dataset after filtering.")
 
     train_loader = DataLoader(
         train_dataset,
@@ -316,7 +341,7 @@ def main():
 
         # Perform evaluation
         print("\nEvaluating on the test set with mask-based evaluation...")
-        metrics, classification_rep = evaluate_model_with_mask(model, test_loader, config, excluded_ids)
+        metrics, classification_rep = evaluate_model_with_mask(model, test_loader, config, event_vocab, excluded_events)
 
         # Print evaluation metrics
         print("Evaluation Metrics (Masked):")
@@ -348,7 +373,7 @@ def main():
 
         # Perform evaluation after training
         print("\nEvaluating on the test set with mask-based evaluation...")
-        metrics, classification_rep = evaluate_model_with_mask(model, test_loader, config, excluded_ids)
+        metrics, classification_rep = evaluate_model_with_mask(model, test_loader, config, event_vocab, excluded_events)
 
         print("Evaluation Metrics (Masked):")
         print(f"Accuracy: {metrics['accuracy'] * 100:.2f}%")
