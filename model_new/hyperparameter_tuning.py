@@ -24,6 +24,8 @@ sample_data = pd.read_csv(dataset_paths["train"])  # Load the training dataset
 event_columns = [col for col in sample_data.columns if col != "cycle"]  # Exclude the "cycle" column
 event_vocab = {event: idx for idx, event in enumerate(event_columns, start=1)}  # Map event names to indices
 event_vocab["<PAD>"] = 0  # Add <PAD> token with ID 0
+if "<EXCLUDED>" not in event_vocab:
+    event_vocab["<EXCLUDED>"] = len(event_vocab)  # Add <EXCLUDED> token for excluded events
 vocab_size = len(event_vocab)
 
 print("Event Vocabulary:", event_vocab)
@@ -35,6 +37,7 @@ experiments = [
     {"embed_size": 256, "num_heads": 8, "num_layers": 4, "learning_rate": 0.0005},
     {"embed_size": 128, "num_heads": 4, "num_layers": 6, "learning_rate": 0.0010},
     {"embed_size": 256, "num_heads": 8, "num_layers": 2, "learning_rate": 0.0001},
+    {"embed_size": 512, "num_heads": 16, "num_layers": 6, "learning_rate": 0.0003},  # Added another experiment
 ]
 
 # Loop through experiments
@@ -50,11 +53,22 @@ for i, exp in enumerate(experiments):
         "max_len": 77,
         "epochs": 10,
         "device": "cuda" if torch.cuda.is_available() else "cpu",
+        "excluded_events": ["event_task_start", "event_task_end"],  # Ensure excluded events are passed
     }
 
     # Create datasets and dataloaders
-    train_dataset = EventDataset(dataset_paths["train"], event_vocab, max_len=config["max_len"])
-    val_dataset = EventDataset(dataset_paths["val"], event_vocab, max_len=config["max_len"])
+    train_dataset = EventDataset(
+        dataset_paths["train"],
+        event_vocab,
+        max_len=config["max_len"],
+        excluded_events=config["excluded_events"]
+    )
+    val_dataset = EventDataset(
+        dataset_paths["val"],
+        event_vocab,
+        max_len=config["max_len"],
+        excluded_events=config["excluded_events"]
+    )
 
     train_loader = DataLoader(
         train_dataset, batch_size=config["batch_size"], shuffle=True, collate_fn=collate_fn
